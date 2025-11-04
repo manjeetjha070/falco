@@ -12,15 +12,13 @@
 #include "std_msgs/msg/float32.hpp"
 #include "nav_msgs/msg/path.hpp"
 #include "nav_msgs/msg/odometry.hpp"
-#include "geometry_msgs/msg/twist_stamped.hpp"
+#include "geometry_msgs/msg/twist.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/point_cloud2.hpp"
 #include "sensor_msgs/msg/joy.hpp"
 
 #include "tf2/transform_datatypes.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
-
-#include "falco_local_planner/msg/joystick_data.hpp"
 
 using namespace std;
 
@@ -30,12 +28,8 @@ class PathFollower : public rclcpp::Node {
 public:
   PathFollower();
 
-  void run();
-
 private:
-  // Parameters
-  double sensorOffsetX;
-  double sensorOffsetY;
+  // Parameters  
   int pubSkipNum;
   bool twoWayDrive;
   double lookAheadDis;
@@ -57,12 +51,9 @@ private:
   bool useInclToStop;
   double inclThre;
   double stopTime;
-  bool noRotAtStop;
   bool noRotAtGoal;
-  bool autonomyMode;
+  
   double autonomySpeed;
-  double joyToSpeedDelay;
-  std::string vehicle;
 
   // State
   float joySpeed = 0, joySpeedRaw = 0, joyYaw = 0;
@@ -84,19 +75,15 @@ private:
 
   // ROS interfaces
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subOdom;
-  rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr subPath;
-  rclcpp::Subscription<falco_local_planner::msg::JoystickData>::SharedPtr subJoystick;
-  rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr subSpeed;
+  rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr subPath; 
   rclcpp::Subscription<std_msgs::msg::Int8>::SharedPtr subStop;
 
-  rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr pubSpeed;
-  geometry_msgs::msg::TwistStamped cmd_vel;
+  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr pubSpeed;
+  geometry_msgs::msg::Twist cmd_vel;
 
   // Callbacks
   void odomHandler(const nav_msgs::msg::Odometry::SharedPtr odomIn);
-  void pathHandler(const nav_msgs::msg::Path::SharedPtr pathIn);
-  void joystickCallback(const  falco_local_planner::msg::JoystickData::SharedPtr msg);
-  void speedHandler(const std_msgs::msg::Float32::SharedPtr speed);
+  void pathHandler(const nav_msgs::msg::Path::SharedPtr pathIn);  
   void stopHandler(const std_msgs::msg::Int8::SharedPtr stop);
 };
 
